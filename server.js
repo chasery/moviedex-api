@@ -2,16 +2,36 @@ const express = require("express");
 const morgan = require("morgan");
 const helmet = require("helmet");
 const cors = require("cors");
+const MOVIES = require("./movies-data.json");
 
 const app = express();
 
 app.use(morgan("dev"));
-app.use(helmet());
-app.use(cors());
+// app.use(helmet());
+// app.use(cors());
 
-app.get("/movies", (req, res) => {
-  res.send(200, "You hit the nail on the head");
-});
+function handleMovieRequest(req, res) {
+  let response = MOVIES;
+
+  if (req.query.genre) {
+    // Do something to response
+    response = response.filter(
+      (movie) => movie.genre.toLowerCase() === req.query.genre.toLowerCase()
+    );
+  }
+
+  if (req.query.country) {
+    // Do something to response
+  }
+
+  if (req.query.avg_vote) {
+    // Do something to response
+  }
+
+  res.json(response);
+}
+
+app.get("/movie", handleMovieRequest);
 
 const PORT = 8000;
 
