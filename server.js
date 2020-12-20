@@ -14,14 +14,15 @@ function handleMovieRequest(req, res) {
   let response = MOVIES;
 
   if (req.query.genre) {
-    // Do something to response
-    response = response.filter(
-      (movie) => movie.genre.toLowerCase() === req.query.genre.toLowerCase()
+    response = response.filter((movie) =>
+      movie.genre.toLowerCase().includes(req.query.genre.toLowerCase())
     );
   }
 
   if (req.query.country) {
-    // Do something to response
+    response = response.filter((movie) =>
+      movie.country.toLowerCase().includes(req.query.country.toLowerCase())
+    );
   }
 
   if (req.query.avg_vote) {
