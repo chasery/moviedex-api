@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const morgan = require("morgan");
 const helmet = require("helmet");
@@ -7,8 +8,18 @@ const MOVIES = require("./movies-data.json");
 const app = express();
 
 app.use(morgan("dev"));
-// app.use(helmet());
-// app.use(cors());
+app.use(helmet());
+app.use(cors());
+app.use(function validateBearerToken(req, res, next) {
+  const apiToken = process.env.API_TOKEN;
+  const authToken = req.get("Authorization");
+
+  if (!authToken || authToken.split(" ")[1] !== apiToken) {
+    return res.status(401).json({ error: "Unautorized request" });
+  }
+
+  next();
+});
 
 function handleMovieRequest(req, res) {
   let response = MOVIES;
@@ -25,7 +36,6 @@ function handleMovieRequest(req, res) {
   }
 
   if (req.query.country) {
-    console.log(req.query.country);
     if (typeof req.query.country !== "string") {
       return res
         .status(400)
@@ -37,12 +47,12 @@ function handleMovieRequest(req, res) {
   }
 
   if (req.query.avg_vote) {
-    const avg_vote = parseFloat(req.query.avg_vote);
+    const avg_vote = Number(req.query.avg_vote);
 
     if (avg_vote > 10 || avg_vote < 0 || isNaN(avg_vote)) {
       return res.status(400).send("Please provide a number between 0-10.");
     }
-    response = response.filter((movie) => movie.avg_vote >= avg_vote);
+    response = response.filter((movie) => Number(movie.avg_vote) >= avg_vote);
   }
 
   res.json(response);
